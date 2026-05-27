@@ -1,3 +1,3 @@
 #!/bin/bash
 
-openssl req -new -keyout private.key -out request.csr -config mtls.cnf
+openssl req -new -keyout $1.key -out $1.csr -config $1.cnf
