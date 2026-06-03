@@ -1,33 +1,46 @@
 # CSR Generation Guide for mTLS with EKU Support
 
-This document outlines the steps to generate a Certificate Signing Request (CSR) configured for mutual TLS (mTLS), including specific Extended Key Usage (EKU) attributes, for submission to DigiCert.
+This repository automates CSR generation for mutual TLS (mTLS) with Extended Key Usage (EKU) attributes.
+The included `generate_csr.sh` script builds a CSR and private key using OpenSSL, while `attributes.toml` provides the default distinguished name values.
 
 ## Prerequisites
-* OpenSSL installed on your system.
-* Access to your DigiCert CertCentral account.
+* Bash shell
+* OpenSSL installed
+* Execute permission on `generate_csr.sh` (`chmod +x generate_csr.sh`)
 
-## Step 1: Create the Configuration File (`req.cnf`)
-Create a file named `req.cnf`. This ensures the CSR contains the necessary extensions for mTLS.
+## Files
+* `generate_csr.sh` — automation script that prompts for certificate details and generates a CSR
+* `attributes.toml` — default DN attributes used when creating the OpenSSL config
+* `outputs/` — generated CSR, key, and config files are saved here
 
-```ini
-[req]
-default_bits = 2048
-prompt = no
-default_md = sha256
-distinguished_name = dn
-req_extensions = req_ext
+## Usage
+1. Update `attributes.toml` with your organization details if needed:
+    ```toml
+    C = US
+    ST = State
+    L = City
+    O = Company, LLC.
+    OU = Department
+    ```
+2. Run the script:
+    ```bash
+    ./generate_csr.sh
+    ```
+3. Enter the requested values:
+    * Common Name (CN)
+    * Email address
+4. The script creates a timestamped directory under `outputs/<CN>/<timestamp>/` and writes:
+    * `<CN>.cnf.template`
+    * `<CN>.cnf`
+    * `<CN>.key`
+    * `<CN>.csr`
 
-[dn]
-C = US
-ST = State
-L = City
-O = Organization
-OU = Department
-CN = your-server-name.example.com
+## What is included in the CSR config
+The generated OpenSSL config enables the following extensions:
+* `subjectAltName` with a DNS entry matching the supplied CN
+* `extendedKeyUsage = clientAuth, serverAuth`
 
-[req_ext]
-subjectAltName = @alt_names
-extendedKeyUsage = clientAuth, serverAuth
-
-[alt_names]
-DNS.1 = your-server-name.example.com
+## Notes
+* The script generates a new key and CSR in one step.
+* If you need a different DN layout, update `attributes.toml` before running the script.
+* The generated config file includes values from `attributes.toml`, the supplied CN, and the provided email address.
