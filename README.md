@@ -5,12 +5,12 @@ The included `generate_csr.sh` script builds a CSR and private key using OpenSSL
 
 ## Pre-Requisites
 
-* Bash (Linux/MacOS/Unix)
+* Bash (Linux/MacOS/Unix/WSL)
 * OpenSSL (https://www.openssl.org/)
 * Ensure the script has the 'Execute' permission set.
 
 ```bash
-chmod +x generate_csr.sh`)
+chmod +x generate_csr.sh
 ```
 
 ## Files
