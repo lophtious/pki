@@ -9,6 +9,7 @@ ATTRIBUTES_FILE="attributes.toml"
 ATTRIBUTES=$(<$ATTRIBUTES_FILE)
 CERTS_STAGING_FOLDER="outputs"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+PASSPHRASE=$(tr -dc 'A-Za-z0-9!@#$&()' < /dev/urandom | head -c 20) # Random 20 Character Passphrase for Private Key encryption (optional, can be removed if not needed)
 
 # Prompt for Common Name
 read -p "Enter the Common Name (CN) for the certificate: " CN
@@ -56,12 +57,18 @@ sed -e "/__CONTENT__/r ${ATTRIBUTES_FILE}" -e "/__CONTENT__/d" "$DIR/$CN.cnf.tem
 #config_path.write_text(config.replace("<<ATTRIBUTES>>", attributes))
 #PY
 
-echo "Generating private key and CSR..."
-openssl req -new -keyout "$DIR/$CN.key" -out "$DIR/$CN.csr" -config "$DIR/$CN.cnf"
+echo "Generating private key and CSR ..."
+openssl req -new -keyout "$DIR/$CN.key" -out "$DIR/$CN.csr" -config "$DIR/$CN.cnf" -passout pass:$PASSPHRASE
+
+echo "Cleaning up temp files ..."
+rm -rf "$DIR/*.template" # Clean up template file
 
 echo "----------------------------------"
 echo "Success!"
 echo "Files generated in: $DIR/"
 echo " - $DIR/$CN.key"
 echo " - $DIR/$CN.csr"
+echo " - $DIR/$CN.csr"
+echo "Private Key (Passphrase: $PASSPHRASE"
+echo "*** Store the passphrase securely, it is required to use the private key! ***"
 echo "-----------------------------------"
