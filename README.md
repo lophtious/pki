@@ -1,4 +1,4 @@
-# CSR Generation Guide for mTLS with EKU Support
+# Generate CSR for mTLS with EKU Support
 
 CSR (Certificate Signing Request) generation for mutual TLS (mTLS) with Extended Key Usage (EKU) attributes.
 The included `generate_csr.sh` script builds a CSR and private key using OpenSSL, while `attributes.toml` provides the default certificate attributes. Mutual TLS (mTLS) requires at minimumum 'clientAuth' or 'serverAuth' EKUs.
@@ -7,7 +7,11 @@ The included `generate_csr.sh` script builds a CSR and private key using OpenSSL
 
 * Bash (Linux/MacOS/Unix)
 * OpenSSL (https://www.openssl.org/)
-* Execute permission on `generate_csr.sh` (`chmod +x generate_csr.sh`)
+* Ensure the script has the 'Execute' permission set.
+
+```bash
+chmod +x generate_csr.sh`)
+```
 
 ## Files
 
@@ -32,22 +36,28 @@ The included `generate_csr.sh` script builds a CSR and private key using OpenSSL
     ```
 
 3. Enter the requested values:
+
     * Common Name (CN)
     * Email address
 
 4. The script creates a timestamped directory under `outputs/<CN>/<timestamp>/` and writes:
-    * `<CN>.cnf.template`
+
     * `<CN>.cnf`
-    * `<CN>.key`
+    * `<CN>.key` (encrypted with an auto-generated passphrase)
     * `<CN>.csr`
 
+5. The console output will display the passphrase used to encrypt the private key. Store it securely, as it is required to use the private key.
+
 ## What is included in the CSR config
+
 The generated OpenSSL config enables the following extensions:
+
 * `subjectAltName` with a DNS entry matching the supplied CN
 * `extendedKeyUsage = clientAuth, serverAuth`
 
 ## Notes
 
-* The script generates a new key and CSR in one step.
+* The script generates a new private key and CSR in one step. 
+* The private key is encrypted with a randomly generated 20-character passphrase.
 * If you need a different DN layout, update `attributes.toml` before running the script.
 * The generated config file includes values from `attributes.toml`, the supplied CN, and the provided email address.
