@@ -3,7 +3,7 @@ UPSTREAM_BRANCH := main
 UPSTREAM_TAG := v1.0.0
 EXCLUDED_FILE := attributes.toml
 
-.PHONY: all setup fetch merge
+.PHONY: all fetch merge
 
 all: merge
 
