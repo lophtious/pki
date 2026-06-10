@@ -1,28 +1,18 @@
 UPSTREAM_URL := https://github.com/lophtious/pki.git
 UPSTREAM_BRANCH := main
-TAG := v1.0.0.0
+UPSTREAM_TAG := v1.0.0
 EXCLUDED_FILE := attributes.toml
 
 .PHONY: all setup fetch merge
 
 all: merge
 
-setup:
-	@git remote get-url upstream >/dev/null 2>&1 || git remote add upstream $(UPSTREAM_URL)
-
-fetch: setup
-	git fetch upstream $(UPSTREAM_BRANCH)
-	git fetch upstream tag $(TAG)
+fetch:
+	git fetch $(UPSTREAM_URL) tag $(UPSTREAM_TAG)
 
 merge: fetch
-	@echo "Merging $(TAG) from upstream..."
-	-git merge $(TAG) --no-commit --no-ff
-	@echo "Restoring local $(EXCLUDED_FILE)..."
-	-git checkout HEAD -- $(EXCLUDED_FILE)
-	-git add $(EXCLUDED_FILE)
-	@echo "========================================================================"
-	@echo "Merge staged! $(EXCLUDED_FILE) has been reverted to your local version."
-	@echo "If 'git merge' reported any conflicts in other files, resolve them now."
-	@echo "Once ready, complete the merge by running:"
-	@echo "    git commit"
-	@echo "========================================================================"
+	@echo "Merging $(UPSTREAM_TAG) from upstream, preserving $(EXCLUDED_FILE)..."
+	git merge --no-commit --no-ff $(UPSTREAM_TAG)
+	@echo "Restoring excluded file: $(EXCLUDED_FILE)"
+	git checkout --ours -- "$(EXCLUDED_FILE)"
+	git add "$(EXCLUDED_FILE)"
